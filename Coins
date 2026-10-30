@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مؤشر العملات الرقمية المباشر | Top 250 Crypto Tracker</title>
+    
+    <!-- خط Cairo من Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --bg-main: #0b0f19;
+            --bg-card: #151d30;
+            --bg-card-hover: #1c2640;
+            --border-color: #24304f;
+            --primary: #3b82f6;
+            --primary-hover: #2563eb;
+            --text-light: #f8fafc;
+            --text-muted: #94a3b8;
+            --green: #10b981;
+            --green-bg: rgba(16, 185, 129, 0.12);
+            --red: #ef4444;
+            --red-bg: rgba(239, 68, 68, 0.12);
+            --ad-bg: #111827;
+            --radius-lg: 16px;
+            --radius-md: 10px;
+            --radius-sm: 6px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Cairo', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-main);
+            color: var(--text-light);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            padding: 24px 16px;
+        }
+
+        .app-container {
+            width: 100%;
+            max-width: 1000px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* الرأس والعنوان الرئيسي */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+            padding-bottom: 6px;
+        }
+
+        .brand-section h1 {
+            font-size: 1.6rem;
+            font-weight: 900;
+            letter-spacing: -0.5px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .brand-section p {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            margin-top: 2px;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .live-indicator {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--green);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            border: 1px solid rgba(16, 185, 129, 0.2);
+        }
+
+        .pulse-dot {
+            width: 8px;
+            height: 8px;
+            background-color: var(--green);
+            border-radius: 50%;
+            animation: pulse-ring 1.8s infinite ease-in-out;
+        }
+
+        @keyframes pulse-ring {
+            0% { transform: scale(0.9); opacity: 0.6; }
+            50% { transform: scale(1.4); opacity: 1; }
+            100% { transform: scale(0.9); opacity: 0.6; }
+        }
+
+        .btn-refresh {
+            background-color: var(--primary);
+            color: #ffffff;
+            border: none;
+            padding: 8px 16px;
+            border-radius: var(--radius-md);
+            font-weight: 700;
+            font-size: 0.85rem;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s ease;
+        }
+
+        .btn-refresh:hover {
+            background-color: var(--primary-hover);
+            transform: translateY(-1px);
+        }
+
+        .btn-refresh:active {
+            transform: scale(0.97);
+        }
+
+        .btn-refresh:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        /* المساحة الإعلانية */
+        .ad-placeholder {
+            width: 100%;
+            min-height: 85px;
+            background-color: var(--ad-bg);
+            border: 1px dashed var(--border-color);
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        /* شريط التحكم والبحث */
+        .controls-card {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 14px 18px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .search-box {
+            position: relative;
+            flex: 1;
+            min-width: 250px;
+        }
+
+        .search-box input {
+            width: 100%;
+            background-color: #0b1120;
+            border: 1.5px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 10px 42px 10px 14px;
+            color: var(--text-light);
+            font-size: 0.9rem;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .search-box input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+        }
+
+        .search-icon {
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            font-size: 1rem;
+            pointer-events: none;
+        }
+
+        .coins-count-badge {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            background: rgba(255, 255, 255, 0.03);
+            padding: 6px 12px;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border-color);
+        }
+
+        /* بطاقة الجدول */
+        .table-card {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+        }
+
+        .table-responsive {
+            width: 100%;
+            max-height: 65vh;
+            overflow-y: auto;
+            overflow-x: auto;
+        }
+
+        /* شريط تمرير ناعم */
+        .table-responsive::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        .table-responsive::-webkit-scrollbar-thumb {
+            background: var(--border-color);
+            border-radius: 4px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: right;
+        }
+
+        thead {
+            position: sticky;
+            top: 0;
+            background-color: #121929;
+            z-index: 10;
+        }
+
+        th {
+            padding: 14px 18px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            border-bottom: 1px solid var(--border-color);
+            white-space: nowrap;
+        }
+
+        tbody tr {
+            border-bottom: 1px solid var(--border-color);
+            transition: background-color 0.15s ease;
+        }
+
+        tbody tr:last-child {
+            border-bottom: none;
+        }
+
+        tbody tr:hover {
+            background-color: var(--bg-card-hover);
+        }
+
+        td {
+            padding: 12px 18px;
+            vertical-align: middle;
+            white-space: nowrap;
+        }
+
+        .rank-cell {
+            color: var(--text-muted);
+            font-size: 0.8rem;
+            font-weight: 600;
+            width: 40px;
+        }
+
+        /* تفاصيل العملة (شعار + اسم) */
+        .coin-meta {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .coin-logo {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background-color: #0b0f19;
+            object-fit: cover;
+        }
+
+        .coin-name-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .coin-name {
+            font-weight: 700;
+            font-size: 0.95rem;
+            color: #ffffff;
+            max-width: 160px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .coin-symbol {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+
+        .price-text {
+            font-weight: 800;
+            font-size: 0.95rem;
+            letter-spacing: 0.3px;
+        }
+
+        /* وسم نسبة التغير */
+        .change-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.82rem;
+            font-weight: 700;
+            direction: ltr; /* لضمان صحة ظهور علامة النسبة والرمز */
+        }
+
+        .change-pill.positive {
+            color: var(--green);
+            background-color: var(--green-bg);
+        }
+
+        .change-pill.negative {
+            color: var(--red);
+            background-color: var(--red-bg);
+        }
+
+        /* شريط التذييل ومعلومات الوقت */
+        .table-footer {
+            padding: 12px 18px;
+            background-color: rgba(255, 255, 255, 0.015);
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .countdown-badge {
+            color: var(--primary);
+            font-weight: 800;
+        }
+
+        /* رسائل الحالة والأخطاء */
+        .status-message {
+            text-align: center;
+            padding: 40px 16px;
+            color: var(--text-muted);
+        }
+
+        .status-message.error {
+            color: var(--red);
+        }
+
+        @media (max-width: 650px) {
+            th, td {
+                padding: 10px 12px;
+            }
+            .brand-section h1 {
+                font-size: 1.3rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+
+    <!-- الرأس الرئيسي -->
+    <header>
+        <div class="brand-section">
+            <h1>⚡ أسعار العملات الرقمية</h1>
+            <p>متابعة لحظية لأهم 250 عملة مشفرة في الأسواق العالمية</p>
+        </div>
+        <div class="header-actions">
+            <div class="live-indicator">
+                <span class="pulse-dot"></span>
+                مباشر
+            </div>
+            <button class="btn-refresh" id="manual-refresh-btn" onclick="triggerManualRefresh()">
+                <span>تحديث فوري</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- مساحة إعلانية علوية -->
+    <aside class="ad-placeholder" aria-label="مساحة إعلانية">
+        📢 مساحة إعلانية
+    </aside>
+
+    <!-- شريط البحث والتحكم -->
+    <div class="controls-card">
+        <div class="search-box">
+            <span class="search-icon">🔍</span>
+            <input type="text" id="search-input" placeholder="ابحث بالاسم أو الرمز (مثل: Bitcoin أو BTC)..." oninput="handleSearch()">
+        </div>
+        <div class="coins-count-badge">
+            المعروض: <b id="displayed-count" style="color: #fff;">0</b> من <b id="total-count">250</b> عملة
+        </div>
+    </div>
+
+    <!-- جدول عرض الأسعار -->
+    <div class="table-card">
+        <div class="table-responsive">
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 40px;">#</th>
+                        <th>العملة</th>
+                        <th>السعر (USD)</th>
+                        <th>التغير (24 ساعة)</th>
+                    </tr>
+                </thead>
+                <tbody id="crypto-table-body">
+                    <tr>
+                        <td colspan="4" class="status-message">
+                            جاري جلب أحدث بيانات 250 عملة من السوق...
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- تذييل الجدول لمعلومات العداد الزمني وآخر تحديث -->
+        <div class="table-footer">
+            <div id="last-updated-text">آخر تحديث: جاري التحميل...</div>
+            <div>
+                التحديث القادم خلال: <span class="countdown-badge" id="countdown-val">60</span> ثانية
+            </div>
+        </div>
+    </div>
+
+    <!-- مساحة إعلانية سفلية -->
+    <aside class="ad-placeholder" aria-label="مساحة إعلانية">
+        📢 مساحة إعلانية
+    </aside>
+
+</div>
+
+<script>
+    const API_URL = "https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=250&page=1&sparkline=false";
+
+    let rawCryptoList = [];       // تخزين الـ 250 عملة كاملة
+    let remainingSeconds = 60;     // عداد التحديث
+    let isFetching = false;        // لمنع الطلبات المزدوجة
+    let timerInterval = null;
+
+    const tableBody = document.getElementById("crypto-table-body");
+    const searchInput = document.getElementById("search-input");
+    const lastUpdatedElem = document.getElementById("last-updated-text");
+    const countdownElem = document.getElementById("countdown-val");
+    const displayedCountElem = document.getElementById("displayed-count");
+    const totalCountElem = document.getElementById("total-count");
+    const refreshBtn = document.getElementById("manual-refresh-btn");
+
+    // تنسيق الأرقام بطريقة ذكية (سواء كانت عملات كبيرة كـ BTC أو كسور صغيرة جداً كـ PEPE)
+    function formatPrice(num) {
+        if (num === null || num === undefined) return "$0.00";
+        if (num >= 1) {
+            return "$" + num.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        } else if (num >= 0.0001) {
+            return "$" + num.toFixed(4);
+        } else {
+            return "$" + num.toFixed(8);
+        }
+    }
+
+    // دالة جلب البيانات مع معالجة الأخطاء (Try / Catch)
+    async function fetchCryptoData() {
+        if (isFetching) return;
+        isFetching = true;
+        refreshBtn.disabled = true;
+        refreshBtn.innerText = "جاري التحديث...";
+
+        try {
+            const response = await fetch(API_URL);
+
+            if (!response.ok) {
+                if (response.status === 429) {
+                    throw new Error("تم تجاوز حد الطلبات المسموح (Rate Limit) من قِبل CoinGecko. يرجى الانتظار دقيقة.");
+                }
+                throw new Error(`خطأ في الخادم: (${response.status})`);
+            }
+
+            const data = await response.json();
+            rawCryptoList = data;
+            
+            totalCountElem.textContent = rawCryptoList.length;
+            renderTable();
+            updateLastUpdatedTime();
+            remainingSeconds = 60; // إعادة ضبط العداد بعد كل جلب ناجح
+        } catch (error) {
+            console.error("Fetch Error:", error);
+            // إذا كان الجدول يحتوي على بيانات سابقة لا نقوم بمسحها، نكتفي بتنبيه
+            if (rawCryptoList.length === 0) {
+                tableBody.innerHTML = `
+                    <tr>
+                        <td colspan="4" class="status-message error">
+                            ⚠️ تعذر تحميل الأسعار: ${error.message}
+                            <br><small style="color:var(--text-muted);">يرجى التأكد من اتصال الإنترنت أو المحاولة بعد قليل</small>
+                        </td>
+                    </tr>
+                `;
+            } else {
+                lastUpdatedElem.innerHTML = `<span style="color: var(--red);">⚠️ فشل التحديث التلقائي (${error.message})</span>`;
+            }
+        } finally {
+            isFetching = false;
+            refreshBtn.disabled = false;
+            refreshBtn.innerText = "تحديث فوري";
+        }
+    }
+
+    // بناء وتصفية صفوف الجدول بناءً على البحث
+    function renderTable() {
+        const query = searchInput.value.trim().toLowerCase();
+
+        // تصفية العملات بالاسم أو الرمز
+        const filteredList = rawCryptoList.filter(coin => {
+            const nameMatch = coin.name.toLowerCase().includes(query);
+            const symbolMatch = coin.symbol.toLowerCase().includes(query);
+            return nameMatch || symbolMatch;
+        });
+
+        displayedCountElem.textContent = filteredList.length;
+
+        if (filteredList.length === 0) {
+            tableBody.innerHTML = `
+                <tr>
+                    <td colspan="4" class="status-message">
+                        لم يتم العثور على أي عملة تطابق بحثك: "<strong>${query}</strong>"
+                    </td>
+                </tr>
+            `;
+            return;
+        }
+
+        // بناء الـ HTML دفعة واحدة لضمان سلاسة وسرعة الأداء مع 250 عنصر
+        const rowsHtml = filteredList.map(coin => {
+            const change = coin.price_change_percentage_24h;
+            const isPositive = (change !== null && change >= 0);
+            const changeFormatted = change !== null ? Math.abs(change).toFixed(2) + "%" : "0.00%";
+            const arrow = isPositive ? "▲ +" : "▼ -";
+            const pillClass = isPositive ? "positive" : "negative";
+
+            return `
+                <tr>
+                    <td class="rank-cell">${coin.market_cap_rank || '-'}</td>
+                    <td>
+                        <div class="coin-meta">
+                            <img class="coin-logo" src="${coin.image}" alt="${coin.name}" loading="lazy" onerror="this.src='https://via.placeholder.com/32?text=?'">
+                            <div class="coin-name-group">
+                                <span class="coin-name" title="${coin.name}">${coin.name}</span>
+                                <span class="coin-symbol">${coin.symbol}</span>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <span class="price-text">${formatPrice(coin.current_price)}</span>
+                    </td>
+                    <td>
+                        <span class="change-pill ${pillClass}">
+                            ${arrow}${changeFormatted}
+                        </span>
+                    </td>
+                </tr>
+            `;
+        }).join("");
+
+        tableBody.innerHTML = rowsHtml;
+    }
+
+    // تصفية سريعة عند الكتابة في مربع البحث
+    function handleSearch() {
+        renderTable();
+    }
+
+    // التحديث الفوري اليدوي
+    function triggerManualRefresh() {
+        fetchCryptoData();
+    }
+
+    // تحديث توقيت آخر سحب للبيانات
+    function updateLastUpdatedTime() {
+        const now = new Date();
+        const timeOptions = { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true };
+        const dateOptions = { year: 'numeric', month: 'short', day: 'numeric' };
+        
+        const timeString = now.toLocaleTimeString('ar-EG', timeOptions);
+        const dateString = now.toLocaleDateString('ar-EG', dateOptions);
+
+        lastUpdatedElem.innerHTML = `آخر تحديث ناجح: <strong>${dateString} - ${timeString}</strong>`;
+    }
+
+    // مؤقت التحديث التلقائي كل ثانية (يحدث البيانات كل 60 ثانية)
+    function startAutoRefreshLoop() {
+        if (timerInterval) clearInterval(timerInterval);
+
+        timerInterval = setInterval(() => {
+            remainingSeconds--;
+            if (remainingSeconds <= 0) {
+                fetchCryptoData();
+                remainingSeconds = 60;
+            }
+            countdownElem.textContent = remainingSeconds;
+        }, 1000);
+    }
+
+    // تشغيل النظام فور تحميل الصفحة
+    fetchCryptoData();
+    startAutoRefreshLoop();
+</script>
+
+</body>
+</html>
