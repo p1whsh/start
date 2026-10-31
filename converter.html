@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>محول الوحدات الشامل | Unit Converter</title>
+    
+    <!-- خط Cairo من Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --bg-page: #f8fafc;
+            --surface: #ffffff;
+            --primary: #0284c7;         /* أزرق نقي وأنيق */
+            --primary-hover: #0369a1;
+            --primary-light: #e0f2fe;   /* أزرق فاتح جداً للخلفيات */
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --border-focus: #38bdf8;
+            --success: #10b981;
+            --ad-bg: #f1f5f9;
+            --radius-lg: 18px;
+            --radius-md: 12px;
+            --radius-sm: 8px;
+            --shadow-card: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.03);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Cairo', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--bg-page);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            padding: 20px 16px;
+        }
+
+        .app-container {
+            width: 100%;
+            max-width: 680px;
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+
+        /* ---------------- ترويسة التطبيق ---------------- */
+        header {
+            text-align: center;
+            padding: 10px 0;
+        }
+
+        header h1 {
+            font-size: 1.65rem;
+            font-weight: 900;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        header p {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-top: 4px;
+        }
+
+        /* ---------------- المساحات الإعلانية ---------------- */
+        .ad-placeholder {
+            width: 100%;
+            min-height: 80px;
+            background-color: var(--ad-bg);
+            border: 1.5px dashed #cbd5e1;
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+
+        /* ---------------- أزرار اختيار نوع التحويل ---------------- */
+        .categories-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 8px;
+            background: var(--surface);
+            padding: 8px;
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow-card);
+        }
+
+        .category-btn {
+            background: transparent;
+            border: none;
+            padding: 10px 4px;
+            border-radius: var(--radius-md);
+            font-size: 0.88rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            transition: all 0.2s ease;
+        }
+
+        .category-btn .icon {
+            font-size: 1.35rem;
+        }
+
+        .category-btn:hover {
+            background-color: var(--primary-light);
+            color: var(--primary);
+        }
+
+        .category-btn.active {
+            background-color: var(--primary);
+            color: #ffffff;
+            box-shadow: 0 4px 12px rgba(2, 132, 199, 0.25);
+        }
+
+        /* ---------------- بطاقة التحويل الرئيسية ---------------- */
+        .converter-card {
+            background: var(--surface);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            box-shadow: var(--shadow-card);
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .section-label {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            margin-bottom: 6px;
+            display: block;
+        }
+
+        /* حقول الإدخال والوحدات */
+        .input-row {
+            display: grid;
+            grid-template-columns: 1fr 140px;
+            gap: 10px;
+        }
+
+        input[type="number"], select {
+            width: 100%;
+            min-height: 52px;
+            border: 1.5px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 10px 14px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--text-main);
+            background-color: #fafafa;
+            outline: none;
+            transition: all 0.2s;
+        }
+
+        input[type="number"]:focus, select:focus {
+            border-color: var(--primary);
+            background-color: #ffffff;
+            box-shadow: 0 0 0 3.5px rgba(2, 132, 199, 0.12);
+        }
+
+        select {
+            cursor: pointer;
+            background-color: #ffffff;
+            font-size: 0.95rem;
+        }
+
+        /* زر العكس التفاعلي */
+        .swap-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: -4px 0;
+            position: relative;
+        }
+
+        .swap-btn {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background-color: var(--primary-light);
+            color: var(--primary);
+            border: 1.5px solid var(--border-color);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+        }
+
+        .swap-btn:hover {
+            background-color: var(--primary);
+            color: #ffffff;
+            transform: rotate(180deg) scale(1.05);
+        }
+
+        .swap-btn:active {
+            transform: rotate(180deg) scale(0.95);
+        }
+
+        /* صندوق عرض النتيجة المباشرة */
+        .result-box {
+            background: linear-gradient(135deg, var(--primary-light), #ffffff);
+            border: 1.5px solid #bae6fd;
+            border-radius: var(--radius-md);
+            padding: 18px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 4px;
+        }
+
+        .result-info {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .result-title {
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--text-muted);
+        }
+
+        .result-value {
+            font-size: 1.8rem;
+            font-weight: 900;
+            color: var(--primary);
+            line-height: 1.2;
+            word-break: break-all;
+        }
+
+        .formula-text {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+
+        /* أزرار الإجراءات */
+        .btn-copy {
+            min-height: 48px;
+            padding: 8px 20px;
+            background-color: var(--primary);
+            color: #ffffff;
+            border: none;
+            border-radius: var(--radius-md);
+            font-size: 0.95rem;
+            font-weight: 700;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 12px rgba(2, 132, 199, 0.2);
+        }
+
+        .btn-copy:hover {
+            background-color: var(--primary-hover);
+            transform: translateY(-1px);
+        }
+
+        .btn-copy:active {
+            transform: scale(0.97);
+        }
+
+        /* إشعار النسخ (Toast) */
+        .toast {
+            position: fixed;
+            bottom: 25px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background-color: var(--text-main);
+            color: #ffffff;
+            padding: 10px 22px;
+            border-radius: 30px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+            opacity: 0;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+
+        /* تحسين التجاوب للشاشات الصغيرة */
+        @media (max-width: 520px) {
+            .categories-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            .input-row {
+                grid-template-columns: 1fr;
+            }
+            .result-box {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .btn-copy {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+
+    <!-- الرأس -->
+    <header>
+        <h1><span>🔄</span> محول الوحدات الشامل</h1>
+        <p>تحويل فوري ودقيق بين العملات، الأطوال، الأوزان، والمزيد</p>
+    </header>
+
+    <!-- مساحة إعلانية علوية -->
+    <aside class="ad-placeholder" aria-label="مساحة إعلانية">
+        📢 مساحة إعلانية
+    </aside>
+
+    <!-- شريط اختيار نوع التحويل -->
+    <nav class="categories-grid" id="categories-container">
+        <button class="category-btn active" onclick="switchCategory('currency', this)">
+            <span class="icon">💱</span>
+            <span>العملات</span>
+        </button>
+        <button class="category-btn" onclick="switchCategory('length', this)">
+            <span class="icon">📏</span>
+            <span>الطول</span>
+        </button>
+        <button class="category-btn" onclick="switchCategory('weight', this)">
+            <span class="icon">⚖️</span>
+            <span>الوزن</span>
+        </button>
+        <button class="category-btn" onclick="switchCategory('temperature', this)">
+            <span class="icon">🌡️</span>
+            <span>الحرارة</span>
+        </button>
+        <button class="category-btn" onclick="switchCategory('time', this)">
+            <span class="icon">⏱️</span>
+            <span>الوقت</span>
+        </button>
+    </nav>
+
+    <!-- بطاقة التحويل التفاعلية -->
+    <main class="converter-card">
+        
+        <!-- حقل التحويل (من) -->
+        <div>
+            <label class="section-label">من:</label>
+            <div class="input-row">
+                <input type="number" id="input-val" value="1" placeholder="أدخل القيمة..." oninput="calculate()">
+                <select id="from-unit" onchange="calculate()"></select>
+            </div>
+        </div>
+
+        <!-- زر التبديل السريع (Swap) -->
+        <div class="swap-container">
+            <button class="swap-btn" onclick="swapUnits()" title="تبديل الوحدتين">
+                ⇅
+            </button>
+        </div>
+
+        <!-- حقل التحويل (إلى) -->
+        <div>
+            <label class="section-label">إلى:</label>
+            <div class="input-row">
+                <input type="number" id="output-val" readonly placeholder="النتيجة..." style="background-color: #f1f5f9; cursor: default;">
+                <select id="to-unit" onchange="calculate()"></select>
+            </div>
+        </div>
+
+        <!-- عرض النتيجة النهائي والنسخ -->
+        <div class="result-box">
+            <div class="result-info">
+                <span class="result-title">النتيجة المحسوبة:</span>
+                <span class="result-value" id="display-result">0</span>
+                <span class="formula-text" id="display-formula"></span>
+            </div>
+            <button class="btn-copy" onclick="copyResult()">
+                📋 نسخ النتيجة
+            </button>
+        </div>
+
+    </main>
+
+    <!-- مساحة إعلانية سفلية -->
+    <aside class="ad-placeholder" aria-label="مساحة إعلانية">
+        📢 مساحة إعلانية
+    </aside>
+
+</div>
+
+<!-- إشعار النسخ المنبثق -->
+<div class="toast" id="toast">✓ تم نسخ النتيجة بنجاح!</div>
+
+<script>
+    /* ========================================================
+       1. بنك بيانات الوحدات ومعدلات التحويل
+       ======================================================== */
+    const unitsData = {
+        // العملات (محسوبة كنسبة معيارية للدولار USD)
+        currency: {
+            title: "العملات",
+            units: {
+                USD: { name: "دولار أمريكي (USD)", rate: 1.0, symbol: "$" },
+                IQD: { name: "دينار عراقي (IQD)", rate: 1310.0, symbol: "د.ع" },
+                EUR: { name: "يورو (EUR)", rate: 0.92, symbol: "€" },
+                SAR: { name: "ريال سعودي (SAR)", rate: 3.75, symbol: "ر.س" }
+            },
+            type: "ratio"
+        },
+        // الطول (المرجع الأساسي: المتر)
+        length: {
+            title: "الطول",
+            units: {
+                m: { name: "متر (m)", rate: 1.0 },
+                km: { name: "كيلومتر (km)", rate: 1000.0 },
+                cm: { name: "سنتيمتر (cm)", rate: 0.01 },
+                in: { name: "إنش (بوصة)", rate: 0.0254 },
+                ft: { name: "قدم (ft)", rate: 0.3048 },
+                mi: { name: "ميل (mi)", rate: 1609.344 }
+            },
+            type: "ratio"
+        },
+        // الوزن (المرجع الأساسي: الكيلوغرام)
+        weight: {
+            title: "الوزن",
+            units: {
+                kg: { name: "كيلوغرام (kg)", rate: 1.0 },
+                g: { name: "غرام (g)", rate: 0.001 },
+                lb: { name: "باوند (رطل)", rate: 0.45359237 },
+                oz: { name: "أونصة (oz)", rate: 0.0283495231 }
+            },
+            type: "ratio"
+        },
+        // الحرارة (تعتمد دوال خاصة للتحويل)
+        temperature: {
+            title: "الحرارة",
+            units: {
+                C: { name: "درجة مئوية (°C)" },
+                F: { name: "فهرنهايت (°F)" },
+                K: { name: "كلفن (K)" }
+            },
+            type: "temperature"
+        },
+        // الوقت (المرجع الأساسي: الثانية)
+        time: {
+            title: "الوقت",
+            units: {
+                s: { name: "ثانية", rate: 1.0 },
+                min: { name: "دقيقة", rate: 60.0 },
+                h: { name: "ساعة", rate: 3600.0 },
+                d: { name: "يوم", rate: 86400.0 },
+                wk: { name: "أسبوع", rate: 604800.0 }
+            },
+            type: "ratio"
+        }
+    };
+
+    let activeCategory = 'currency';
+
+    // عناصر الواجهة
+    const inputVal = document.getElementById('input-val');
+    const outputVal = document.getElementById('output-val');
+    const fromUnit = document.getElementById('from-unit');
+    const toUnit = document.getElementById('to-unit');
+    const displayResult = document.getElementById('display-result');
+    const displayFormula = document.getElementById('display-formula');
+
+    /* ========================================================
+       2. تعبئة وتغيير الأقسام والوحدات
+       ======================================================== */
+    function switchCategory(categoryKey, btnElement) {
+        activeCategory = categoryKey;
+        
+        // تحديث حالة الأزرار
+        document.querySelectorAll('.category-btn').forEach(btn => btn.classList.remove('active'));
+        btnElement.classList.add('active');
+
+        populateUnitsDropdowns();
+        calculate();
+    }
+
+    function populateUnitsDropdowns() {
+        const units = unitsData[activeCategory].units;
+        const keys = Object.keys(units);
+
+        fromUnit.innerHTML = '';
+        toUnit.innerHTML = '';
+
+        keys.forEach((key, index) => {
+            const optFrom = new Option(units[key].name, key);
+            const optTo = new Option(units[key].name, key);
+            fromUnit.add(optFrom);
+            toUnit.add(optTo);
+        });
+
+        // تعيين اختيار افتراضي مختلف لكل حقل
+        if (keys.length > 1) {
+            fromUnit.selectedIndex = 0;
+            toUnit.selectedIndex = 1;
+        }
+    }
+
+    /* ========================================================
+       3. خوارزمية التحويل المباشر (Live Conversion)
+       ======================================================== */
+    function calculate() {
+        const value = parseFloat(inputVal.value);
+        const from = fromUnit.value;
+        const to = toUnit.value;
+        const category = unitsData[activeCategory];
+
+        if (isNaN(value)) {
+            outputVal.value = '';
+            displayResult.textContent = '0';
+            displayFormula.textContent = '';
+            return;
+        }
+
+        let result = 0;
+
+        if (category.type === 'ratio') {
+            // التحويل عبر النسب المعيارية
+            const baseValue = value * category.units[from].rate;
+            result = baseValue / category.units[to].rate;
+        } else if (category.type === 'temperature') {
+            // التحويل الخاص بدرجات الحرارة
+            result = convertTemperature(value, from, to);
+        }
+
+        // تنسيق الرقم لمنع الكسور العشرية الطويلة الشاذة
+        const formattedResult = formatCleanNumber(result);
+
+        outputVal.value = formattedResult;
+        displayResult.textContent = `${formattedResult} ${getUnitShortName(to)}`;
+        displayFormula.textContent = `1 ${getUnitShortName(from)} = ${formatCleanNumber(getUnitRatio(from, to))} ${getUnitShortName(to)}`;
+    }
+
+    function convertTemperature(val, from, to) {
+        if (from === to) return val;
+        
+        // التحويل أولاً إلى مئوي
+        let celsius = val;
+        if (from === 'F') celsius = (val - 32) * (5 / 9);
+        else if (from === 'K') celsius = val - 273.15;
+
+        // التحويل من مئوي إلى الهدف
+        if (to === 'C') return celsius;
+        if (to === 'F') return (celsius * (9 / 5)) + 32;
+        if (to === 'K') return celsius + 273.15;
+        
+        return 0;
+    }
+
+    function getUnitRatio(from, to) {
+        const cat = unitsData[activeCategory];
+        if (cat.type === 'ratio') {
+            return cat.units[from].rate / cat.units[to].rate;
+        } else {
+            return convertTemperature(1, from, to);
+        }
+    }
+
+    function getUnitShortName(key) {
+        return unitsData[activeCategory].units[key].name.split(' ')[0];
+    }
+
+    function formatCleanNumber(num) {
+        // إظهار حتى 5 أرقام بعد الفاصلة مع حذف الأصفار غير الضرورية
+        return parseFloat(num.toFixed(5)).toString();
+    }
+
+    /* ========================================================
+       4. زر التبديل والنسخ
+       ======================================================== */
+    function swapUnits() {
+        const currentFrom = fromUnit.value;
+        fromUnit.value = toUnit.value;
+        toUnit.value = currentFrom;
+        calculate();
+    }
+
+    function copyResult() {
+        const text = outputVal.value;
+        if (!text) return;
+
+        const fullText = `${text} ${getUnitShortName(toUnit.value)}`;
+        navigator.clipboard.writeText(fullText).then(() => {
+            showToast();
+        });
+    }
+
+    function showToast() {
+        const toast = document.getElementById('toast');
+        toast.classList.add('show');
+        setTimeout(() => {
+            toast.classList.remove('show');
+        }, 2200);
+    }
+
+    // التهيئة المبدئية عند التشغيل
+    populateUnitsDropdowns();
+    calculate();
+</script>
+
+</body>
+</html>
