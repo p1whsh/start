@@ -1,0 +1,960 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>صانع السيرة الذاتية الاحترافي | CV Builder</title>
+    
+    <!-- خط Cairo من Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+
+    <!-- مكتبة html2pdf لتصدير ملفات PDF بجودة عالية -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+    <style>
+        :root {
+            --bg-page: #f8fafc;
+            --surface: #ffffff;
+            --primary: #0284c7;         /* أزرق سماوي هادئ */
+            --primary-hover: #0369a1;
+            --primary-light: #e0f2fe;   /* خلفية فاتحة للأزرار والعناصر */
+            --text-dark: #0f172a;       /* رمادي غامق للنصوص */
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --danger: #ef4444;
+            --danger-light: #fee2e2;
+            --ad-bg: #f1f5f9;
+            --radius-lg: 16px;
+            --radius-md: 10px;
+            --radius-sm: 6px;
+            --shadow-card: 0 4px 16px rgba(0, 0, 0, 0.05);
+            --shadow-paper: 0 10px 30px rgba(0, 0, 0, 0.08);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Cairo', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--bg-page);
+            color: var(--text-dark);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 16px;
+        }
+
+        .app-wrapper {
+            width: 100%;
+            max-width: 1380px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* ---------------- الرأس وأزرار التحكم ---------------- */
+        header {
+            background-color: var(--surface);
+            padding: 16px 24px;
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow-card);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .brand-info h1 {
+            font-size: 1.45rem;
+            font-weight: 800;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .brand-info p {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            margin-top: 2px;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        /* الأزرار العامة */
+        .btn {
+            min-height: 44px;
+            padding: 8px 18px;
+            border-radius: var(--radius-md);
+            font-size: 0.9rem;
+            font-weight: 700;
+            cursor: pointer;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: #ffffff;
+            box-shadow: 0 4px 12px rgba(2, 132, 199, 0.25);
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-hover);
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background-color: var(--primary-light);
+            color: var(--primary);
+        }
+
+        .btn-secondary:hover {
+            background-color: #bae6fd;
+        }
+
+        .btn-danger {
+            background-color: var(--danger-light);
+            color: var(--danger);
+        }
+
+        .btn-danger:hover {
+            background-color: #fecaca;
+        }
+
+        /* ---------------- المساحات الإعلانية ---------------- */
+        .ad-placeholder {
+            width: 100%;
+            min-height: 80px;
+            background-color: var(--ad-bg);
+            border: 1px dashed #cbd5e1;
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        /* ---------------- تقسيم الشاشة الرئيسية ---------------- */
+        .workspace-grid {
+            display: grid;
+            grid-template-columns: 1.15fr 1fr; /* المعاينة يميناً والنموذج يساراً في الـ RTL */
+            gap: 24px;
+            align-items: start;
+        }
+
+        /* حاوية النموذج (Form) */
+        .form-side {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .form-card {
+            background: var(--surface);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 20px;
+            box-shadow: var(--shadow-card);
+        }
+
+        .card-title {
+            font-size: 1.1rem;
+            font-weight: 800;
+            color: var(--primary);
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 8px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin-bottom: 12px;
+        }
+
+        .input-group label {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+
+        input[type="text"], input[type="email"], input[type="tel"], textarea {
+            width: 100%;
+            min-height: 44px;
+            border: 1.5px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 8px 12px;
+            font-size: 0.9rem;
+            color: var(--text-dark);
+            outline: none;
+            background-color: #fafbfc;
+            transition: all 0.2s ease;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        input:focus, textarea:focus {
+            border-color: var(--primary);
+            background-color: #ffffff;
+            box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.12);
+        }
+
+        /* العناصر الديناميكية (الخبرات / التعليم / المهارات) */
+        .dynamic-item-card {
+            background-color: #f8fafc;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 14px;
+            margin-bottom: 10px;
+            position: relative;
+        }
+
+        .btn-delete-item {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: none;
+            border: none;
+            color: var(--danger);
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 700;
+            padding: 4px;
+        }
+
+        .skills-input-wrapper {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+
+        .skills-tags-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .skill-tag-badge {
+            background-color: var(--primary-light);
+            color: var(--primary);
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .skill-tag-badge span {
+            cursor: pointer;
+            color: var(--danger);
+            font-weight: bold;
+        }
+
+        /* ---------------- حاوية المعاينة (Live Preview) ---------------- */
+        .preview-side {
+            position: sticky;
+            top: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* تصميم ورقة السيرة الذاتية (A4 Styling) */
+        .cv-paper {
+            width: 100%;
+            max-width: 595px; /* تناسب A4 */
+            min-height: 842px;
+            background: #ffffff;
+            border-radius: 2px;
+            box-shadow: var(--shadow-paper);
+            padding: 40px;
+            border: 1px solid #e2e8f0;
+            display: flex;
+            flex-direction: column;
+            gap: 22px;
+            position: relative;
+            box-sizing: border-box;
+        }
+
+        /* ترويسة الـ CV */
+        .cv-header {
+            border-bottom: 2px solid var(--primary);
+            padding-bottom: 16px;
+        }
+
+        .cv-header h2 {
+            font-size: 1.8rem;
+            font-weight: 900;
+            color: var(--text-dark);
+            line-height: 1.2;
+        }
+
+        .cv-header .cv-title {
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-top: 4px;
+        }
+
+        .cv-contacts {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 10px;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .cv-contacts span {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        /* أقسام السيرة الذاتية في المعاينة */
+        .cv-section {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .cv-section-title {
+            font-size: 0.95rem;
+            font-weight: 800;
+            color: var(--primary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            border-bottom: 1px solid #f1f5f9;
+            padding-bottom: 4px;
+        }
+
+        .cv-summary-text {
+            font-size: 0.88rem;
+            line-height: 1.7;
+            color: #334155;
+            white-space: pre-line;
+        }
+
+        .cv-item {
+            margin-bottom: 10px;
+        }
+
+        .cv-item-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            font-size: 0.9rem;
+            font-weight: 800;
+            color: var(--text-dark);
+        }
+
+        .cv-item-sub {
+            font-size: 0.82rem;
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 4px;
+        }
+
+        .cv-item-desc {
+            font-size: 0.82rem;
+            color: #475569;
+            line-height: 1.6;
+            white-space: pre-line;
+        }
+
+        .cv-skills-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .cv-skill-chip {
+            background-color: var(--primary-light);
+            color: var(--primary-hover);
+            padding: 3px 10px;
+            border-radius: 4px;
+            font-size: 0.78rem;
+            font-weight: 700;
+        }
+
+        /* ---------------- استجابة الشاشات (Responsive) ---------------- */
+        @media (max-width: 1024px) {
+            .workspace-grid {
+                grid-template-columns: 1fr;
+            }
+            .preview-side {
+                position: static;
+                order: -1; /* المعاينة تظهر أولاً أو تتابع طبيعي */
+            }
+        }
+
+        @media (max-width: 600px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            .cv-paper {
+                padding: 24px 18px;
+            }
+            header {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .header-actions {
+                justify-content: stretch;
+            }
+            .header-actions .btn {
+                flex: 1;
+            }
+        }
+
+        /* ---------------- تنسيقات الطباعة الخاصة ---------------- */
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+            header, .ad-placeholder, .form-side {
+                display: none !important;
+            }
+            .workspace-grid {
+                display: block;
+            }
+            .preview-side {
+                position: static;
+            }
+            .cv-paper {
+                box-shadow: none;
+                border: none;
+                width: 100%;
+                max-width: 100%;
+                padding: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="app-wrapper">
+
+    <!-- الرأس وأزرار التحكم الرئيسية -->
+    <header>
+        <div class="brand-info">
+            <h1>📄 صانع السيرة الذاتية الاحترافي</h1>
+            <p>أنشئ وحمّل سيرتك الذاتية في دقائق بتصميم عصري وأنيق</p>
+        </div>
+        <div class="header-actions">
+            <button class="btn btn-secondary" onclick="loadSampleData()">📝 تعبئة نموذجية</button>
+            <button class="btn btn-danger" onclick="clearAllData()">🗑️ مسح</button>
+            <button class="btn btn-secondary" onclick="window.print()">🖨️ طباعة</button>
+            <button class="btn btn-primary" onclick="exportPDF()">⬇️ تحميل PDF</button>
+        </div>
+    </header>
+
+    <!-- مساحة إعلانية علوية -->
+    <aside class="ad-placeholder" aria-label="مساحة إعلانية">
+        📢 مساحة إعلانية
+    </aside>
+
+    <!-- مساحة العمل الرئيسية المقسمة -->
+    <main class="workspace-grid">
+
+        <!-- القسم الأيمن (في الواجهة العربية): المعاينة المباشرة (Live Preview) -->
+        <section class="preview-side">
+            <div class="cv-paper" id="cv-preview-paper">
+                <!-- الرأس: الاسم والوظيفة وبيانات التواصل -->
+                <div class="cv-header">
+                    <h2 id="prev-name">الاسم الكامل</h2>
+                    <div class="cv-title" id="prev-title">المسمى الوظيفي</div>
+                    <div class="cv-contacts">
+                        <span id="prev-email-wrap">📧 <span id="prev-email">email@example.com</span></span>
+                        <span id="prev-phone-wrap">📱 <span id="prev-phone">+964 770 000 0000</span></span>
+                        <span id="prev-address-wrap">📍 <span id="prev-address">بغداد، العراق</span></span>
+                    </div>
+                </div>
+
+                <!-- نبذة عنك -->
+                <div class="cv-section" id="prev-summary-section">
+                    <div class="cv-section-title">نبذة شخصية</div>
+                    <p class="cv-summary-text" id="prev-summary">اكتب هنا نبذة تعريفية توجز خبراتك وأهدافك المهنية ومهاراتك بطريقة تلفت أنظار مسؤولي التوظيف.</p>
+                </div>
+
+                <!-- الخبرات العملية -->
+                <div class="cv-section" id="prev-experience-section">
+                    <div class="cv-section-title">الخبرات المهنية</div>
+                    <div id="prev-experience-list">
+                        <!-- تُعرض الخبرات هنا تلقائياً -->
+                    </div>
+                </div>
+
+                <!-- التعليم -->
+                <div class="cv-section" id="prev-education-section">
+                    <div class="cv-section-title">التعليم والمؤهلات</div>
+                    <div id="prev-education-list">
+                        <!-- يُعرض التعليم هنا تلقائياً -->
+                    </div>
+                </div>
+
+                <!-- المهارات -->
+                <div class="cv-section" id="prev-skills-section">
+                    <div class="cv-section-title">المهارات والقدرات</div>
+                    <div class="cv-skills-grid" id="prev-skills-list">
+                        <!-- تظهر المهارات كشارات أنيقة -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- القسم الأيسر (في الواجهة العربية): نموذج إدخال البيانات (Form) -->
+        <section class="form-side">
+            <!-- 1. البيانات الشخصية -->
+            <div class="form-card">
+                <h3 class="card-title">👤 البيانات الأساسية</h3>
+                <div class="form-row">
+                    <div class="input-group">
+                        <label>الاسم الكامل</label>
+                        <input type="text" id="input-name" placeholder="مثال: أحمد علي حسن" oninput="updateCV()">
+                    </div>
+                    <div class="input-group">
+                        <label>المسمى الوظيفي</label>
+                        <input type="text" id="input-title" placeholder="مثال: مهندس برمجيات واجهات" oninput="updateCV()">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="input-group">
+                        <label>البريد الإلكتروني</label>
+                        <input type="email" id="input-email" placeholder="example@gmail.com" oninput="updateCV()">
+                    </div>
+                    <div class="input-group">
+                        <label>رقم الهاتف</label>
+                        <input type="tel" id="input-phone" placeholder="+964 7XX XXX XXXX" oninput="updateCV()">
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label>العنوان / الإقامة (اختياري)</label>
+                    <input type="text" id="input-address" placeholder="المدينة، الدولة" oninput="updateCV()">
+                </div>
+            </div>
+
+            <!-- 2. النبذة التعريفية -->
+            <div class="form-card">
+                <h3 class="card-title">📝 نبذة عنك (الملخص المهني)</h3>
+                <div class="input-group" style="margin-bottom:0;">
+                    <textarea id="input-summary" placeholder="اكتب نبذة مختصرة عن شغفك وإنجازاتك..." oninput="updateCV()"></textarea>
+                </div>
+            </div>
+
+            <!-- 3. المهارات -->
+            <div class="form-card">
+                <h3 class="card-title">⚡ المهارات</h3>
+                <div class="skills-input-wrapper">
+                    <input type="text" id="input-skill-text" placeholder="اكتب مهارة واضغط إضافة..." onkeypress="handleSkillEnter(event)">
+                    <button class="btn btn-secondary" onclick="addSkill()">+ إضافة</button>
+                </div>
+                <div class="skills-tags-container" id="form-skills-container">
+                    <!-- وسوم المهارات القابلة للحذف -->
+                </div>
+            </div>
+
+            <!-- 4. الخبرات المهنية -->
+            <div class="form-card">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                    <h3 class="card-title" style="margin-bottom:0; border:none; padding:0;">💼 الخبرات السابقة</h3>
+                    <button class="btn btn-secondary" onclick="addExperience()">+ إضافة وظيفة</button>
+                </div>
+                <div id="form-experience-container">
+                    <!-- حقول الخبرات الديناميكية -->
+                </div>
+            </div>
+
+            <!-- 5. التعليم -->
+            <div class="form-card">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                    <h3 class="card-title" style="margin-bottom:0; border:none; padding:0;">🎓 التعليم والشهادات</h3>
+                    <button class="btn btn-secondary" onclick="addEducation()">+ إضافة مؤهل</button>
+                </div>
+                <div id="form-education-container">
+                    <!-- حقول التعليم الديناميكية -->
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- مساحة إعلانية سفلية -->
+    <aside class="ad-placeholder" aria-label="مساحة إعلانية">
+        📢 مساحة إعلانية
+    </aside>
+
+</div>
+
+<script>
+    /* ========================================================
+       1. حالة البيانات (Application State)
+       ======================================================== */
+    let skillsList = [];
+    let experienceList = [];
+    let educationList = [];
+
+    /* ========================================================
+       2. المعاينة المباشرة (Live Preview Logic)
+       ======================================================== */
+    function updateCV() {
+        // تحديث البيانات الأساسية
+        const name = document.getElementById('input-name').value.trim() || 'الاسم الكامل';
+        const title = document.getElementById('input-title').value.trim() || 'المسمى الوظيفي';
+        const email = document.getElementById('input-email').value.trim() || 'email@example.com';
+        const phone = document.getElementById('input-phone').value.trim() || '+964 770 000 0000';
+        const address = document.getElementById('input-address').value.trim() || 'المدينة، الدولة';
+        const summary = document.getElementById('input-summary').value.trim() || 'اكتب هنا نبذة توجز مسيرتك وأهدافك وخبراتك.';
+
+        document.getElementById('prev-name').textContent = name;
+        document.getElementById('prev-title').textContent = title;
+        document.getElementById('prev-email').textContent = email;
+        document.getElementById('prev-phone').textContent = phone;
+        document.getElementById('prev-address').textContent = address;
+        document.getElementById('prev-summary').textContent = summary;
+
+        renderPreviewExperience();
+        renderPreviewEducation();
+        renderPreviewSkills();
+    }
+
+    /* ========================================================
+       3. إدارة المهارات (Skills Management)
+       ======================================================== */
+    function addSkill() {
+        const input = document.getElementById('input-skill-text');
+        const skill = input.value.trim();
+        if (skill && !skillsList.includes(skill)) {
+            skillsList.push(skill);
+            input.value = '';
+            renderFormSkills();
+            renderPreviewSkills();
+        }
+    }
+
+    function handleSkillEnter(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            addSkill();
+        }
+    }
+
+    function removeSkill(index) {
+        skillsList.splice(index, 1);
+        renderFormSkills();
+        renderPreviewSkills();
+    }
+
+    function renderFormSkills() {
+        const container = document.getElementById('form-skills-container');
+        container.innerHTML = '';
+        skillsList.forEach((skill, index) => {
+            const badge = document.createElement('div');
+            badge.className = 'skill-tag-badge';
+            badge.innerHTML = `${skill} <span onclick="removeSkill(${index})" title="حذف">✕</span>`;
+            container.appendChild(badge);
+        });
+    }
+
+    function renderPreviewSkills() {
+        const previewContainer = document.getElementById('prev-skills-list');
+        previewContainer.innerHTML = '';
+        if (skillsList.length === 0) {
+            previewContainer.innerHTML = '<span class="cv-skill-chip">المهارات المضافة ستظهر هنا</span>';
+            return;
+        }
+        skillsList.forEach(skill => {
+            const chip = document.createElement('span');
+            chip.className = 'cv-skill-chip';
+            chip.textContent = skill;
+            previewContainer.appendChild(chip);
+        });
+    }
+
+    /* ========================================================
+       4. إدارة الخبرات المهنية (Experience Management)
+       ======================================================== */
+    function addExperience(company = '', role = '', period = '', desc = '') {
+        const id = Date.now() + Math.random();
+        experienceList.push({ id, company, role, period, desc });
+        renderFormExperience();
+        renderPreviewExperience();
+    }
+
+    function updateExperienceItem(id, field, value) {
+        const item = experienceList.find(x => x.id === id);
+        if (item) {
+            item[field] = value;
+            renderPreviewExperience();
+        }
+    }
+
+    function removeExperience(id) {
+        experienceList = experienceList.filter(x => x.id !== id);
+        renderFormExperience();
+        renderPreviewExperience();
+    }
+
+    function renderFormExperience() {
+        const container = document.getElementById('form-experience-container');
+        container.innerHTML = '';
+
+        experienceList.forEach(item => {
+            const div = document.createElement('div');
+            div.className = 'dynamic-item-card';
+            div.innerHTML = `
+                <button class="btn-delete-item" onclick="removeExperience(${item.id})">حذف ✕</button>
+                <div class="form-row">
+                    <div class="input-group">
+                        <label>المسمى الوظيفي</label>
+                        <input type="text" value="${item.role}" placeholder="مثال: مطور برمجيات" oninput="updateExperienceItem(${item.id}, 'role', this.value)">
+                    </div>
+                    <div class="input-group">
+                        <label>اسم الشركة أو المؤسسة</label>
+                        <input type="text" value="${item.company}" placeholder="مثال: شركة الحلول الذكية" oninput="updateExperienceItem(${item.id}, 'company', this.value)">
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label>الفترة الزمنية</label>
+                    <input type="text" value="${item.period}" placeholder="مثال: 2021 - حتى الآن" oninput="updateExperienceItem(${item.id}, 'period', this.value)">
+                </div>
+                <div class="input-group" style="margin-bottom:0;">
+                    <label>الوصف والمسؤوليات</label>
+                    <textarea placeholder="أبرز المهام والإنجازات التي قمت بها..." oninput="updateExperienceItem(${item.id}, 'desc', this.value)">${item.desc}</textarea>
+                </div>
+            `;
+            container.appendChild(div);
+        });
+    }
+
+    function renderPreviewExperience() {
+        const container = document.getElementById('prev-experience-list');
+        container.innerHTML = '';
+
+        if (experienceList.length === 0) {
+            container.innerHTML = '<p class="cv-item-desc" style="color:var(--text-muted);">أضف خبراتك الوظيفية لعرضها هنا.</p>';
+            return;
+        }
+
+        experienceList.forEach(item => {
+            const el = document.createElement('div');
+            el.className = 'cv-item';
+            el.innerHTML = `
+                <div class="cv-item-head">
+                    <span>${item.role || 'المسمى الوظيفي'}</span>
+                    <span style="font-size:0.8rem; font-weight:600; color:#64748b;">${item.period || 'الفترة'}</span>
+                </div>
+                <div class="cv-item-sub">${item.company || 'اسم الشركة'}</div>
+                <div class="cv-item-desc">${item.desc || ''}</div>
+            `;
+            container.appendChild(el);
+        });
+    }
+
+    /* ========================================================
+       5. إدارة التعليم (Education Management)
+       ======================================================== */
+    function addEducation(university = '', degree = '', year = '') {
+        const id = Date.now() + Math.random();
+        educationList.push({ id, university, degree, year });
+        renderFormEducation();
+        renderPreviewEducation();
+    }
+
+    function updateEducationItem(id, field, value) {
+        const item = educationList.find(x => x.id === id);
+        if (item) {
+            item[field] = value;
+            renderPreviewEducation();
+        }
+    }
+
+    function removeEducation(id) {
+        educationList = educationList.filter(x => x.id !== id);
+        renderFormEducation();
+        renderPreviewEducation();
+    }
+
+    function renderFormEducation() {
+        const container = document.getElementById('form-education-container');
+        container.innerHTML = '';
+
+        educationList.forEach(item => {
+            const div = document.createElement('div');
+            div.className = 'dynamic-item-card';
+            div.innerHTML = `
+                <button class="btn-delete-item" onclick="removeEducation(${item.id})">حذف ✕</button>
+                <div class="form-row">
+                    <div class="input-group">
+                        <label>الدرجة / التخصص</label>
+                        <input type="text" value="${item.degree}" placeholder="مثال: بكالوريوس علوم حاسوب" oninput="updateEducationItem(${item.id}, 'degree', this.value)">
+                    </div>
+                    <div class="input-group">
+                        <label>الجامعة / المعهد</label>
+                        <input type="text" value="${item.university}" placeholder="مثال: جامعة بغداد" oninput="updateEducationItem(${item.id}, 'university', this.value)">
+                    </div>
+                </div>
+                <div class="input-group" style="margin-bottom:0;">
+                    <label>سنة التخرج</label>
+                    <input type="text" value="${item.year}" placeholder="مثال: 2022" oninput="updateEducationItem(${item.id}, 'year', this.value)">
+                </div>
+            `;
+            container.appendChild(div);
+        });
+    }
+
+    function renderPreviewEducation() {
+        const container = document.getElementById('prev-education-list');
+        container.innerHTML = '';
+
+        if (educationList.length === 0) {
+            container.innerHTML = '<p class="cv-item-desc" style="color:var(--text-muted);">أضف مؤهلاتك التعليمية لعرضها هنا.</p>';
+            return;
+        }
+
+        educationList.forEach(item => {
+            const el = document.createElement('div');
+            el.className = 'cv-item';
+            el.innerHTML = `
+                <div class="cv-item-head">
+                    <span>${item.degree || 'التخصص أو الشهادة'}</span>
+                    <span style="font-size:0.8rem; font-weight:600; color:#64748b;">${item.year || 'السنة'}</span>
+                </div>
+                <div class="cv-item-sub">${item.university || 'الجامعة'}</div>
+            `;
+            container.appendChild(el);
+        });
+    }
+
+    /* ========================================================
+       6. تحميل الـ PDF والوظائف المساعدة
+       ======================================================== */
+    function exportPDF() {
+        const element = document.getElementById('cv-preview-paper');
+        const name = document.getElementById('input-name').value.trim() || 'سيرة_ذاتية';
+
+        // خيارات التصدير لمكتبة html2pdf
+        const opt = {
+            margin:       [10, 10, 10, 10],
+            filename:     `${name.replace(/\s+/g, '_')}_CV.pdf`,
+            image:        { type: 'jpeg', quality: 0.98 },
+            html2canvas:  { scale: 2, useCORS: true, letterRendering: true },
+            jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+        };
+
+        html2pdf().set(opt).from(element).save();
+    }
+
+    function clearAllData() {
+        if (!confirm('هل أنت متأكد من رغبتك في مسح كافة البيانات؟')) return;
+
+        document.getElementById('input-name').value = '';
+        document.getElementById('input-title').value = '';
+        document.getElementById('input-email').value = '';
+        document.getElementById('input-phone').value = '';
+        document.getElementById('input-address').value = '';
+        document.getElementById('input-summary').value = '';
+
+        skillsList = [];
+        experienceList = [];
+        educationList = [];
+
+        renderFormSkills();
+        renderFormExperience();
+        renderFormEducation();
+        updateCV();
+    }
+
+    // تعبئة بيانات نموذجية جاهزة ليتضح جمال التصميم مباشرة عند الفتح
+    function loadSampleData() {
+        document.getElementById('input-name').value = 'علي محمد الرافدين';
+        document.getElementById('input-title').value = 'مطور واجهات أمامية أول (Senior Frontend Developer)';
+        document.getElementById('input-email').value = 'ali.aliraq@example.com';
+        document.getElementById('input-phone').value = '+964 780 123 4567';
+        document.getElementById('input-address').value = 'بغداد، المنصور';
+        document.getElementById('input-summary').value = 'مطور واجهات متخصص بخبرة تفوق 5 سنوات في بناء تطبيقات الويب السريعة والمتجاوبة وتجارب المستخدم الاستثنائية. شغوف بتحويل الأفكار المعقدة إلى واجهات رقمية سلسة، نظيفة، وقابلة للتطوير.';
+
+        skillsList = ['JavaScript (ES6+)', 'React.js', 'HTML5 & CSS3', 'Git & GitHub', 'UI/UX Design', 'TailwindCSS', 'حل المشكلات', 'العمل الجماعي'];
+        renderFormSkills();
+
+        experienceList = [
+            {
+                id: 1,
+                company: 'شركة حلول التقنية الرقمية',
+                role: 'مطور واجهات ومصمم تجربة مستخدم',
+                period: '2022 - حتى الآن',
+                desc: '• قيادة تطوير منصات الويب للعملاء وتحسين سرعة الاستجابة بنسبة 35%.\n• تصميم وبناء أنظمة واجهات متكاملة متوافقة مع جميع الأجهزة والهواتف.'
+            },
+            {
+                id: 2,
+                company: 'وكالة الإبداع للبرمجيات',
+                role: 'مطور واجهات ويب مبتدئ',
+                period: '2020 - 2022',
+                desc: '• المساهمة في بناء صفحات الهبوط التفاعلية وتطوير تطبيقات صفحة واحدة (SPA).\n• ربط الواجهات بـ RESTful APIs ومعالجة الأخطاء.'
+            }
+        ];
+        renderFormExperience();
+
+        educationList = [
+            {
+                id: 1,
+                university: 'جامعة بغداد - كلية العلوم',
+                degree: 'بكالوريوس في علوم الحاسوب',
+                year: '2016 - 2020'
+            }
+        ];
+        renderFormEducation();
+
+        updateCV();
+    }
+
+    // تشغيل البيانات النموذجية مبدئياً عند تحميل الصفحة
+    window.onload = function() {
+        loadSampleData();
+    };
+</script>
+
+</body>
+</html>
